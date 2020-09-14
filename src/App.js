@@ -45,10 +45,10 @@ constructor (props) {
       boardHistory: [
         ...this.state.boardHistory, 
         {
-        partNumber: this.state.boardHistory.length,
-        xIsNext: this.state.xIsNext,
-        clicked: this.clickedSquare,
-        squares: squaresToHistory,
+          partNumber: this.state.boardHistory.length,
+          xIsNext: this.state.xIsNext,
+          clicked: this.clickedSquare,
+          squares: squaresToHistory,
         }
       ],
       squares: squares,
@@ -57,6 +57,7 @@ constructor (props) {
   }
 
  handleClickHistory(Event,i) {
+  
   console.log('Volt',this.state.boardHistory.slice());
 
   const boardHistoryPartNum = Event.target.closest('.history-item').getAttribute('historypart');
@@ -66,10 +67,23 @@ constructor (props) {
   const oldHist = (this.state.boardHistory.slice());
   console.log('Get a slice from old: ', oldHist);
 
-
-
   console.log('Setting new history...');
 
+
+  const boardHistoryPart = this.state.boardHistory.slice()[boardHistoryPartNum];
+  console.log('boardHistoryPart squares', boardHistoryPart.squares);
+
+  const newBoardHistory = this.state.boardHistory.slice(0, boardHistoryPartNum);
+  console.log('newBoardHistory', newBoardHistory);
+  
+  this.setState({
+    boardHistory: [...newBoardHistory],
+    squares: boardHistoryPart.squares,
+    xIsNext: !boardHistoryPart.xIsNext,
+  });
+
+
+ /*
   this.setState({
     boardHistory: [{partNumber: 10, xIsNext: false, clicked: 110, squares: ["O", "O", "O", "O", "O", "O", "O", "O", "O"]},
       {partNumber: 11, xIsNext: false, clicked: 111, squares: ["LoL", null, null, null, null, null, null, null, null]},
@@ -90,7 +104,7 @@ constructor (props) {
 
    const newHist = (this.state.boardHistory.slice());
    console.log('Get a slice from new: ', newHist);
-
+*/
 
  /*
    console.log('Volt',this.state.boardHistory.slice());
@@ -145,7 +159,7 @@ constructor (props) {
               squares={this.state.squares} 
               xIsNext={this.state.xIsNext}
               clicked={this.clickedSquare}
-              onClick={(Event,i) => this.handleClick(Event,i)}
+              onClick={this.handleClick.bind(this)}
             />
           </div>
           <div className="game-info">
@@ -156,7 +170,7 @@ constructor (props) {
           
             <ShowHistory 
               history={this.state.boardHistory}
-              onClick={(Event,i) => this.handleClickHistory(Event,i)}
+              onClick={this.handleClickHistory.bind(this)}
               historyMoves={this.historyMoves}
             />
           </div>
