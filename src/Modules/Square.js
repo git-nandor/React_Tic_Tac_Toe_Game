@@ -5,7 +5,7 @@ export default function Square(props) {
   return (
     <button
       className="square"
-      onClick={(Event) => props.onClick(Event)}
+      onClick={props.onClick ? (Event) => props.onClick(Event) : null}
     >
       {props.value}
     </button>

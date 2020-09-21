@@ -4,28 +4,26 @@ import Board from './Modules/Board';
 import ShowHistory from './Modules/ShowHistory'
 import './App.css';
 
-    // A létrehozott JSX element class-át módosíthatom?
+    // A létrehozott JSX element class-át módosíthatom? vagy a módosításokat mindig egy megelőző logika végezze? prepareValue = (<span className="current">{this.props.squares[i]}</span>)
 
 class Game extends React.Component {
 constructor (props) {
   super (props);
-  this.clickedSquare = null;
-  this.historyMoves = -3;
+  this.clickedSquares = [];
+  this.historyBoardNumber = -3; // TODO
 
   this.state = {
-    squares: Array(9).fill(null),
+    squares: Array(25).fill(null), // **************** dinamic for board size!!!!!!!!!!!!!!!
     xIsNext: true,
     boardHistory: []
   };
 }
 
   handleClick(Event,i) {
-    console.log('In handleClick',this.state.boardHistory.slice());
-    this.checkState();
 
     let squaresObjectsFromHistory = [];
     let squaresToHistory = [];
-    this.clickedSquare = i;
+    this.clickedSquares.push(i);
     
     const squares = this.state.squares.slice();
     squares[i] = this.state.xIsNext ? 'X' : 'O';
@@ -45,109 +43,39 @@ constructor (props) {
       boardHistory: [
         ...this.state.boardHistory, 
         {
+          actualMoveNumber: this.state.boardHistory.length,
+          boardHistoryPartNum: this.state.boardHistory.length-1,
           partNumber: this.state.boardHistory.length,
-          xIsNext: this.state.xIsNext,
-          clicked: this.clickedSquare,
+          clicked: this.clickedSquares.slice(),
           squares: squaresToHistory,
+          xIsNext: this.state.xIsNext,
         }
       ],
+      actualMoveNumber: this.state.boardHistory.length-1,
       squares: squares,
       xIsNext: !this.state.xIsNext,
     })
+
+
   }
 
  handleClickHistory(Event,i) {
-  
-  console.log('Volt',this.state.boardHistory.slice());
-
   const boardHistoryPartNum = Event.target.closest('.history-item').getAttribute('historypart');
-  console.log('From ', this.state.boardHistory.length-1,  this.state.boardHistory[this.state.boardHistory.length-1].squares);
-  console.log('Back to history ', boardHistoryPartNum, 'For:', this.state.boardHistory.slice()[boardHistoryPartNum].squares);
-  
-  const oldHist = (this.state.boardHistory.slice());
-  console.log('Get a slice from old: ', oldHist);
-
-  console.log('Setting new history...');
-
-
+ 
   const boardHistoryPart = this.state.boardHistory.slice()[boardHistoryPartNum];
-  console.log('boardHistoryPart squares', boardHistoryPart.squares);
+  const newBoardHistory = this.state.boardHistory.slice(0, parseInt(boardHistoryPartNum)+1);
+  this.clickedSquares = newBoardHistory[newBoardHistory.length-1].clicked.slice();
 
-  const newBoardHistory = this.state.boardHistory.slice(0, boardHistoryPartNum);
-  console.log('newBoardHistory', newBoardHistory);
-  
+ 
+
   this.setState({
     boardHistory: [...newBoardHistory],
     squares: boardHistoryPart.squares,
     xIsNext: !boardHistoryPart.xIsNext,
+    actualMoveNumber: boardHistoryPart.actualMoveNumber,
   });
-
-
- /*
-  this.setState({
-    boardHistory: [{partNumber: 10, xIsNext: false, clicked: 110, squares: ["O", "O", "O", "O", "O", "O", "O", "O", "O"]},
-      {partNumber: 11, xIsNext: false, clicked: 111, squares: ["LoL", null, null, null, null, null, null, null, null]},
-      {partNumber: 12, xIsNext: false, clicked: 112, squares: ["LoL", null, null, null, null, null, null, null, null]}],
-    squares: ["LoL", "LoL", "LoL", "LoL", "LoL", "LoL", "LoL", "LoL", "LoL"],
-    xIsNext: false,
-  });
-
-
-
-    const boardHistoryPart = this.state.boardHistory.slice()[boardHistoryPartNum];
-    console.log('Lett',this.state.boardHistory.slice());
-
-    console.log('Calling HANDLECLICK for:',boardHistoryPart.clicked);
-    this.handleClick(2);
-    console.log('Lett after call handleClick',this.state.boardHistory.slice());
-
-
-   const newHist = (this.state.boardHistory.slice());
-   console.log('Get a slice from new: ', newHist);
-*/
-
- /*
-   console.log('Volt',this.state.boardHistory.slice());
-
-    const boardHistoryPartNum = Event.target.closest('.history-item').getAttribute('historypart');
-    console.log('boardHistoryPartNum', boardHistoryPartNum);
-
-    const boardHistoryPart = this.state.boardHistory.slice()[boardHistoryPartNum];
-    console.log('boardHistoryPart squares', boardHistoryPart.squares);
-
-    const newBoardHistory = this.state.boardHistory.slice(0, boardHistoryPartNum);
-    console.log('newBoardHistory', newBoardHistory);
-    
-    this.setState({
-      boardHistory: [...newBoardHistory],
-      squares: boardHistoryPart.squares,
-      xIsNext: !boardHistoryPart.xIsNext,
-    });
-  */
-
-
-  /*
-   const newHist = (this.state.boardHistory.slice());
-   console.log('Get a slice from new: ', newHist);
-   this.checkState();
-  */
-  }
-
-
-  checkState(){
-    const againNewHist = (this.state.boardHistory.slice());
-    console.log('Get a slice AGAIN from new: ', againNewHist);
-  }
-
-  clearState() {
-    console.log('Clearing');
-    this.setState({
-      boardHistory: [0],
-      squares: [0],
-      xIsNext: true,
-    })
-  }
-
+  
+}
 
   render() {
     return (
@@ -155,10 +83,11 @@ constructor (props) {
         <div className="game">
           <div className="game-board">
             <Board
+              actualMoveNumber = {this.state.boardHistory.length-1}
               currentFlag={true}
               squares={this.state.squares} 
               xIsNext={this.state.xIsNext}
-              clicked={this.clickedSquare}
+              clicked={this.clickedSquares.slice()}
               onClick={this.handleClick.bind(this)}
             />
           </div>
@@ -171,19 +100,14 @@ constructor (props) {
             <ShowHistory 
               history={this.state.boardHistory}
               onClick={this.handleClickHistory.bind(this)}
-              historyMoves={this.historyMoves}
+              historyBoardNumber={this.historyBoardNumber}//TODO
             />
           </div>
         </div>
       </div>
     );
   }
-
-
 }
-
-
-
 
 function App() {
 
