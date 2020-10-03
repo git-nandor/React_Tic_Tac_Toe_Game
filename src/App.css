@@ -8,7 +8,7 @@
 }
 
 .title {
-  margin-top: 0.3em;
+  margin-top: 0em;
   margin-bottom: 0em;
 }
 .description{
@@ -50,11 +50,16 @@ ol, ul {
   padding-left: 30px;
 }
 
+.board-slider{
+  display: inline-block;
+}
+
 .board-row {
   margin-left: auto;
   margin-right: auto;
   display: table;
 }
+
 .board-row:after {
   clear: both;
   content: "";
@@ -103,7 +108,7 @@ ol, ul {
 }
 
 .game {
-  padding-top: 1.5em;
+  padding-top: .1em;
   padding-bottom: .5em;
   display: table;
   margin: auto;
@@ -120,7 +125,7 @@ ol, ul {
   padding: 0px;
   margin-left: 10px;
   margin-top: 0px;
-  margin-bottom: 0px;
+  margin-bottom: .5em;
 }
 .history-description {
   margin-bottom: 0px;
@@ -130,3 +135,22 @@ ol, ul {
   display: inline-flex;
   margin-right: 10px;
 }
+
+.restart-button {
+  background-color: #434956;
+  border: none;
+  color: #62dafb;
+  padding: 5px 11px 5px 11px;
+  margin-bottom: 20px;
+  outline: 1px solid #476d78;
+  cursor: pointer;
+}
+
+.restart-button:focus {
+  background-color: #292c34;
+  outline: 1px solid #317182;
+}
+
+.MuiSlider-thumb:hover {
+  box-shadow: 0px 0px 0px 8px rgb(98 218 251 / 0.1);
+} 

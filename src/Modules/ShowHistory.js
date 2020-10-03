@@ -3,16 +3,14 @@ import Board from './Board';
 
 
 export default function ShowHistory(props) {
-  // OMG TODO historyBoardNumber
-  let historyParts2 = props.history.slice(-4);
-  let x =  historyParts2.slice();
-  x.splice(-1);
-  let historyParts = x;
+  let lastFewHistoryParts = props.history.slice(props.historyBoardNumber-1);
+  let lastFewHistoryPartsWithouthEnd =  lastFewHistoryParts.slice();
+  lastFewHistoryPartsWithouthEnd.splice(-1);
+  let historyParts = lastFewHistoryPartsWithouthEnd; 
   
-
-
     const HistoryBoards = historyParts.map((element, index) => 
-      <li className='history-item' key={index} historypart={element.partNumber}>
+    
+      <li className={`history-item`} key={index} historypart={element.partNumber}>
         <Board
           historyFlag={true}
           actualMoveNumber={element.actualMoveNumber}
@@ -21,10 +19,12 @@ export default function ShowHistory(props) {
           xIsNext={element.xIsNext}
           partNumber={element.partNumber}
           onClick={(Event) => props.onClick(Event,index)}
+          boardSize={props.boardSize}
+          winPatternLength={element.winPatternLength}
         />
       </li>
     );
-
+    
     if (historyParts.length > 0) {
       return (
         <div>

@@ -9,44 +9,36 @@ export default class Board extends React.Component {
     this.winner = null;
   }
 
-  renderBoard(boardSizep) {
-    let boardSize = 5;
+  renderBoard(boardSize) {
     let prepareBoardRows = [];
-
+   
     for (let boardRowsNumber = 0; boardRowsNumber < boardSize; boardRowsNumber++) {
-      console.log('boardRowsNumber',boardRowsNumber);
       prepareBoardRows.push(<div key={boardRowsNumber} className="board-row"> {this.renderBoardRow(boardRowsNumber, boardSize)}</div>);
     };
-    console.log('renderboard: prepareBoardRows:',prepareBoardRows);
+    
     return (
-      <div className="board-container">
+      <div className="board-container" >
         {prepareBoardRows}
       </div>
     );
   }
 
   renderBoardRow(rowNumber, boardSize) {
-
     let prepareRowSquares = [];
 
-    console.log('renderBoardRow: rowNumber, boardSize', rowNumber,boardSize );
     for (let rowSquare = rowNumber * boardSize; rowSquare < (rowNumber + 1) * boardSize; rowSquare++) {
-      console.log('renderSquare:',rowSquare);
       prepareRowSquares.push(<span key={'rs' + rowSquare}>{this.renderSquare(rowSquare)}</span>);
     };
-    console.log('renderBoardRow: prepareRowSquares', prepareRowSquares );
     return (
       <>
         {prepareRowSquares}
       </>
     );
-    
   }
 
   renderSquare(i) {
     let prepareValue;
     let unClickable = false;
-    console.log('------------------renderSquare(i)',i);
 
     // Current board Current
     if (this.props.squares[i] !== null && this.props.currentFlag && parseInt(i) === this.props.clicked[this.props.actualMoveNumber] ) {
@@ -90,10 +82,9 @@ export default class Board extends React.Component {
     this.win = false;
     let winner = null;
 
-
     if (this.props.clicked.length > 0  && this.props.currentFlag) {
-      winner = calculateWinner(this.props.squares, this.props.clicked[this.props.clicked.length-1]);
-    };
+      winner = calculateWinner(this.props.squares, this.props.clicked[this.props.clicked.length-1], this.props.boardSize, this.props.winPatternLength);
+    }
 
     if (winner) {
       status = (<span className = "win">Winner: {winner}!</span>);  
@@ -101,21 +92,19 @@ export default class Board extends React.Component {
     } else if (!this.props.historyFlag){
       status = 'Next player: ' + (this.props.xIsNext ? 'X' : 'O');
     } 
+   
     return (
       <div>
         <div className="status">{status}</div>
           {this.renderBoard(this.props.boardSize)}
       </div>
-    );
+    )
   }
 }
 
-const calculateWinner = (squares, i) => {
-  console.log('calc WINNER ************************** ', squares, i);
-  const boardSize = 5;
-  const winPatternLength = 3;
+const calculateWinner = (squares, i, boardSize, winPatternLength) => {
   const clicked = parseInt(i);
-  let winSquares = [parseInt(i)];
+  let winSquares = [clicked];
   let hasWinner = false;
 
   // Check Horizontal+  (board border && length of winner pattern)
@@ -125,9 +114,11 @@ const calculateWinner = (squares, i) => {
     h1++
   ) {
       if (squares[clicked] === squares[h1]) {
-        if (!winSquares.includes(h1)) winSquares.push(h1);
+        if (!winSquares.includes(h1)) {
+          winSquares.push(h1)
+        }
       } else {break} 
-    };
+    }
 
   // Check Horizontal-
   for (let h2 = clicked; 
@@ -136,12 +127,15 @@ const calculateWinner = (squares, i) => {
     h2--
   ) {
       if (squares[clicked] === squares[h2]) {
-        if (!winSquares.includes(h2)) winSquares.push(h2);
+        if (!winSquares.includes(h2)) {
+          winSquares.push(h2)
+        }
       } else {break} 
-    }; 
+    }
   // If found in Horizontal set hasWinner  
-  if (winSquares.length === winPatternLength) {console.log('FOUND WINNER IN Check Horizontal');hasWinner = true}; 
-
+  if (winSquares.length >= winPatternLength) {
+    hasWinner = true
+  }; 
 
  // Check Vertical+ 
  if (!hasWinner) {
@@ -151,10 +145,12 @@ const calculateWinner = (squares, i) => {
     v1 <= (clicked + ((winPatternLength-1) * boardSize)); 
     v1 += boardSize
   ) {
-      if (squares[clicked] === squares[v1] && !winSquares.includes(v1)) {
-        winSquares.push(v1)
+      if (squares[clicked] === squares[v1]) {
+        if (!winSquares.includes(v1)) {
+          winSquares.push(v1)
+        }
       } else {break} 
-    };
+    }
 
   // Check Vertical-  
   for (let v2 = clicked; 
@@ -163,13 +159,16 @@ const calculateWinner = (squares, i) => {
     v2 -= boardSize
   ) {
       if (squares[clicked] === squares[v2]) {
-        if (!winSquares.includes(v2)) winSquares.push(v2);
+        if (!winSquares.includes(v2)) {
+          winSquares.push(v2)
+        }
       } else {break} 
-    };
+    }
   // If found in Vertical set hasWinner
-  if (winSquares.length === winPatternLength) {console.log('FOUND WINNER IN Vertical');hasWinner = true}; 
+  if (winSquares.length >= winPatternLength) {
+    hasWinner = true
+  }
 }
-
 
 // Check Diagonal_a: vertical+ & horizontal-   
 if (!hasWinner) {
@@ -185,9 +184,11 @@ if (!hasWinner) {
          ((Math.floor(da1/boardSize) < Math.floor((da1 + (boardSize - 1)) / boardSize)) || // New row step 
          (da1 === (clicked + ((winPatternLength - 1) * (boardSize - 1))))) // Last of win pattern
       ) {
-          if (!winSquares.includes(da1)) winSquares.push(da1);
+          if (!winSquares.includes(da1)) {
+            winSquares.push(da1)
+          }
         } else {break} 
-    }; 
+    }
 
   // Check Diagonal_a: vertical- & horizontal+   
   for (let da2 = clicked; 
@@ -201,13 +202,16 @@ if (!hasWinner) {
          ((Math.floor(da2/boardSize) > Math.floor((da2 - (boardSize - 1)) / boardSize)) || // New row step
          (da2 === (clicked - ((winPatternLength - 1) * (boardSize - 1))))) // Last of win pattern
       ) {
-        if (!winSquares.includes(da2)) winSquares.push(da2);
+        if (!winSquares.includes(da2)) {
+          winSquares.push(da2)
+        }
       } else {break} 
-    }; 
+    }
   // If found in Diagonal_a set hasWinner
-  if (winSquares.length === winPatternLength) {console.log('FOUND WINNER IN Diagonal_a');hasWinner = true};  
+  if (winSquares.length >= winPatternLength) {
+    hasWinner = true
+  }  
 } 
-
 
 // Check Diagonal_b: vertical- & horizontal-  
 if (!hasWinner) { 
@@ -219,9 +223,11 @@ if (!hasWinner) {
     db1 -= (boardSize + 1) 
   ) {
       if (squares[clicked] === squares[db1]) {
-        if (!winSquares.includes(db1)) winSquares.push(db1);
+        if (!winSquares.includes(db1)) {
+          winSquares.push(db1)
+        }
       } else {break} 
-    }; 
+    }
 
   // Check Diagonal_b: vertical+ & horizontal+   
   for (let db2 = clicked; 
@@ -231,21 +237,24 @@ if (!hasWinner) {
     db2 += (boardSize + 1) 
   ) {
       if (squares[clicked] === squares[db2]) {
-        if (!winSquares.includes(db2)) winSquares.push(db2);
+        if (!winSquares.includes(db2)) {
+          winSquares.push(db2)
+        }
       } else {break} 
-    };
+    }
   // If found in Diagonal_a set hasWinner
-  if (winSquares.length === winPatternLength) {console.log('FOUND WINNER IN Diagonal_b');hasWinner = true}; 
+  if (winSquares.length >= winPatternLength) {
+    hasWinner = true
+  }
 } 
-
 
 if (hasWinner) {  
   winSquares.forEach(winSquare => {
-    squares[winSquare] = (<span className="win">{squares[winSquare]}</span>);
-  });
+    squares[winSquare] = (<span className="win">{squares[winSquare]}</span>)
+  })
  
   // Return the winner symbole X/O
-  return squares[winSquares[0]];
+  return squares[winSquares[0]]
 }
-  return null;
-}
+  return null
+} 

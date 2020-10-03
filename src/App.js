@@ -1,35 +1,59 @@
 import React from 'react';
 import logo from './logo.svg';
 import Board from './Modules/Board';
-import ShowHistory from './Modules/ShowHistory'
+import ShowHistory from './Modules/ShowHistory';
+import Slider from './Modules/Slider';
 import './App.css';
-
-    // A létrehozott JSX element class-át módosíthatom? vagy a módosításokat mindig egy megelőző logika végezze? prepareValue = (<span className="current">{this.props.squares[i]}</span>)
 
 class Game extends React.Component {
 constructor (props) {
   super (props);
   this.clickedSquares = [];
-  this.historyBoardNumber = -3; // TODO
+  this.historyBoardNumber = -3; 
+  this.newGameFlag = true;
+  this.winPatternLength = 3;
 
   this.state = {
-    squares: Array(25).fill(null), // **************** dinamic for board size!!!!!!!!!!!!!!!
+    boardSize: null,
+    squares: [], 
     xIsNext: true,
     boardHistory: []
   };
-}
+} 
+
+  restartGame(event, value) {
+    let prepareBoardSize;
+     
+    if(value) {
+      prepareBoardSize = value;
+    } else {
+      prepareBoardSize = this.state.boardSize;
+    }
+
+     let prepareSquares = Array((prepareBoardSize * prepareBoardSize)).fill(null);
+
+      // Evade infinite loop
+      if (this.state.boardSize !== value) {
+        
+        this.clickedSquares = [];
+        this.setState({
+          boardSize: prepareBoardSize,
+          squares: prepareSquares,
+          xIsNext: true,
+          boardHistory: []
+        })
+      }
+  }
 
   handleClick(Event,i) {
-
     let squaresObjectsFromHistory = [];
     let squaresToHistory = [];
-    this.clickedSquares.push(i);
-    
     const squares = this.state.squares.slice();
+
+    this.clickedSquares.push(i);
     squares[i] = this.state.xIsNext ? 'X' : 'O';
 
     if (this.state.boardHistory.length > 0) {
-
       squaresObjectsFromHistory = this.state.boardHistory.slice();
       squaresToHistory = squaresObjectsFromHistory[squaresObjectsFromHistory.length-1].squares.slice();
 
@@ -38,7 +62,7 @@ constructor (props) {
     }
 
     squaresToHistory[i] = this.state.xIsNext ? 'X' : 'O';
-    
+  
     this.setState({
       boardHistory: [
         ...this.state.boardHistory, 
@@ -55,8 +79,6 @@ constructor (props) {
       squares: squares,
       xIsNext: !this.state.xIsNext,
     })
-
-
   }
 
  handleClickHistory(Event,i) {
@@ -66,8 +88,6 @@ constructor (props) {
   const newBoardHistory = this.state.boardHistory.slice(0, parseInt(boardHistoryPartNum)+1);
   this.clickedSquares = newBoardHistory[newBoardHistory.length-1].clicked.slice();
 
- 
-
   this.setState({
     boardHistory: [...newBoardHistory],
     squares: boardHistoryPart.squares,
@@ -75,14 +95,33 @@ constructor (props) {
     actualMoveNumber: boardHistoryPart.actualMoveNumber,
   });
   
+  if(this.state.boardHistory.length > 0 && this.newGameFlag) { 
+    this.newGameFlag = false;
+  }
 }
 
   render() {
     return (
       <div>
         <div className="game">
+        <div className={'restart'}>
+        <button
+          className="restart-button"
+          onClick={this.restartGame.bind(this)}
+        >
+          Restart
+        </button>
+          </div>
+          <div className={'board-slider'}>
+            <Slider 
+              changeBoardSize={this.restartGame.bind(this)} 
+            />
+          </div>
           <div className="game-board">
             <Board
+              newGameFlag={this.newGameFlag}
+              boardSize={this.state.boardSize}
+              winPatternLength={this.winPatternLength}
               actualMoveNumber = {this.state.boardHistory.length-1}
               currentFlag={true}
               squares={this.state.squares} 
@@ -98,9 +137,11 @@ constructor (props) {
           <div className="boards">
           
             <ShowHistory 
+              boardSize={this.state.boardSize}
+              winPatternLength={this.winPatternLength}
               history={this.state.boardHistory}
               onClick={this.handleClickHistory.bind(this)}
-              historyBoardNumber={this.historyBoardNumber}//TODO
+              historyBoardNumber={this.historyBoardNumber}
             />
           </div>
         </div>
@@ -110,7 +151,6 @@ constructor (props) {
 }
 
 function App() {
-
   return (
     <div className="App">
       <header className="App-header">
@@ -133,6 +173,3 @@ function App() {
 }
 
 export default App;
-
-
-
