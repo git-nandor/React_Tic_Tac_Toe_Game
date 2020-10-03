@@ -10,7 +10,6 @@ constructor (props) {
   super (props);
   this.clickedSquares = [];
   this.historyBoardNumber = -3; 
-  this.newGameFlag = true;
   this.winPatternLength = 3;
 
   this.state = {
@@ -94,10 +93,6 @@ constructor (props) {
     xIsNext: !boardHistoryPart.xIsNext,
     actualMoveNumber: boardHistoryPart.actualMoveNumber,
   });
-  
-  if(this.state.boardHistory.length > 0 && this.newGameFlag) { 
-    this.newGameFlag = false;
-  }
 }
 
   render() {
@@ -119,7 +114,6 @@ constructor (props) {
           </div>
           <div className="game-board">
             <Board
-              newGameFlag={this.newGameFlag}
               boardSize={this.state.boardSize}
               winPatternLength={this.winPatternLength}
               actualMoveNumber = {this.state.boardHistory.length-1}
